@@ -1,0 +1,40 @@
+- Make Display base class and make SSD1306 static.
+- Create event queue and make dispatch async.
+  - Dispatch from UI::Process()
+- Make Timetick take fns as well as objects to simplify simple delay use case
+
+- make icon id dynamic (so apps can register/remove them)
+- add deregister for icons
+- add deregister for timetick events.
+
+- Make timetick, keypad, blink, SD, EventHandler?, Menu? 
+c libs (not cpp classes).
+
+- Make SSD1306 static (will this work with simulator??).
+
+Architecture
+------------
+MenuEntry branch types MAY contain event handlers.
+When this type if traverse in menu. Handler gets called with APP_START event.
+This is where icons can be registered, lcd_start/stop lines can be set,
+and any other setup that needs to be done.
+
+After that point all events will funnel through apps eventhandler instead of
+system event handler. If the app event handler wishes not to handle an event
+they simply must return false and it will get handled by the handler below it
+(or system handler if nothing else). It is advised that the app not handle
+key events or the menu will stop functioning.
+
+When the menu is traversed back past the "app" entry then the app will receive
+an APP_STOP event and the event handler will be popped off the list. This
+makes it possible to embed multiple event handlers if necessary.
+
+The system event handler will handle or discard any events that do not otherwise
+get handled.
+
+
+
+// icon strategy
+register icon id/callback
+draw_icons where they should go (idx, line, x, width)
+display() will call cb() to get bitmap

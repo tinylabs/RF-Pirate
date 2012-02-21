@@ -1,0 +1,17 @@
+RF Pirate project
+Elliot Buller 2011-2012
+
+This project is based on a atmega32u4 microcontroller connected to the 
+silabs 4432 ISM transceiver. There is also a 128 x 64 oled display ssd1306
+and a microsd card.
+
+The intention is to have a very low-cost platform to experiment with various
+radio protocols. The Si4432 is capable of OOK, FSK and GFSK. With minor front
+end tuning it should be possible to communicate with many low speed RF
+protocols.
+
+Please note: All files under sw/lufa-lib, and sw/bootloader are owned by the very talented Dean Camera. Please see for licensing information (http://www.fourwalledcubicle.com).
+
+All other hardware schematics, gerbers, software is licensed under creative commons (by-nc-sa). For more information read LICENSE or download it from http://creativecommons.org/licenses/by-nc-sa/3.0/legalcode.
+
+Above all I hope people can use and improve this in ways I never intended!

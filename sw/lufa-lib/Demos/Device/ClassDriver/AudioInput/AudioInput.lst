@@ -1,0 +1,381 @@
+   1               		.file	"AudioInput.c"
+   2               	__SREG__ = 0x3f
+   3               	__SP_H__ = 0x3e
+   4               	__SP_L__ = 0x3d
+   5               	__CCP__ = 0x34
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+  15               	.Ltext0:
+  16               		.section	.text.LEDs_SetAllLEDs,"ax",@progbits
+  18               	LEDs_SetAllLEDs:
+  19               	.LFB8:
+  20               	.LSM0:
+  21               	.LVL0:
+  22               	/* prologue: function */
+  23               	/* frame size = 0 */
+  24               	/* stack size = 0 */
+  25               	.L__stack_usage = 0
+  26               	.LSM1:
+  27 0000 9BB1      		in r25,43-32
+  28 0002 9F70      		andi r25,lo8(15)
+  29 0004 982B      		or r25,r24
+  30 0006 9BB9      		out 43-32,r25
+  31               	/* epilogue start */
+  32               	.LSM2:
+  33 0008 0895      		ret
+  34               	.LFE8:
+  36               		.section	.text.SetupHardware,"ax",@progbits
+  37               	.global	SetupHardware
+  39               	SetupHardware:
+  40               	.LFB97:
+  41               	.LSM3:
+  42               	/* prologue: function */
+  43               	/* frame size = 0 */
+  44               	/* stack size = 0 */
+  45               	.L__stack_usage = 0
+  46               	.LSM4:
+  47 0000 84B7      		in r24,84-32
+  48 0002 877F      		andi r24,lo8(-9)
+  49 0004 84BF      		out 84-32,r24
+  50               	.LSM5:
+  51 0006 88E1      		ldi r24,lo8(24)
+  52               	/* #APP */
+  53               	 ;  78 "AudioInput.c" 1
+  54 0008 0FB6      		in __tmp_reg__, __SREG__
+  55 000a F894      		cli
+  56 000c 8093 6000 		sts 96, r24
+  57 0010 1092 6000 		sts 96, __zero_reg__
+  58 0014 0FBE      		out __SREG__,__tmp_reg__
+  59               		
+  60               	 ;  0 "" 2
+  61               	.LVL1:
+  62               	/* #NOAPP */
+  63               	.LBB41:
+  64               	.LBB42:
+  65               	.LSM6:
+  66 0016 90E0      		ldi r25,lo8(0)
+  67 0018 80E8      		ldi r24,lo8(-128)
+  68               	/* #APP */
+  69               	 ;  1492 "/usr/lib/gcc/avr/4.5.3/../../../avr/include/avr/power.h" 1
+  70 001a 0FB6      		in __tmp_reg__,__SREG__
+  71 001c F894      		cli
+  72 001e 8093 6100 		sts 97, r24
+  73 0022 9093 6100 		sts 97, r25
+  74 0026 0FBE      		out __SREG__, __tmp_reg__
+  75               	 ;  0 "" 2
+  76               	/* #NOAPP */
+  77               	.LBE42:
+  78               	.LBE41:
+  79               	.LBB43:
+  80               	.LBB44:
+  81               	.LSM7:
+  82 0028 8AB1      		in r24,42-32
+  83 002a 806F      		ori r24,lo8(-16)
+  84 002c 8AB9      		out 42-32,r24
+  85               	.LSM8:
+  86 002e 8BB1      		in r24,43-32
+  87 0030 8F70      		andi r24,lo8(15)
+  88 0032 8BB9      		out 43-32,r24
+  89               	.LBE44:
+  90               	.LBE43:
+  91               	.LSM9:
+  92 0034 0E94 0000 		call USB_Init
+  93               	.LVL2:
+  94               	.LBB45:
+  95               	.LBB46:
+  96               	.LSM10:
+  97 0038 EAE7      		ldi r30,lo8(122)
+  98 003a F0E0      		ldi r31,hi8(122)
+  99 003c 85EA      		ldi r24,lo8(-91)
+ 100 003e 8083      		st Z,r24
+ 101               	.LVL3:
+ 102               	.LBE46:
+ 103               	.LBE45:
+ 104               	.LBB47:
+ 105               	.LBB48:
+ 106               	.LSM11:
+ 107 0040 8298      		cbi 48-32,2
+ 108               	.LSM12:
+ 109 0042 AEE7      		ldi r26,lo8(126)
+ 110 0044 B0E0      		ldi r27,hi8(126)
+ 111 0046 8C91      		ld r24,X
+ 112 0048 8460      		ori r24,lo8(4)
+ 113 004a 8C93      		st X,r24
+ 114               	.LVL4:
+ 115               	.LBE48:
+ 116               	.LBE47:
+ 117               	.LBB49:
+ 118               	.LBB50:
+ 119               	.LSM13:
+ 120 004c 82E4      		ldi r24,lo8(66)
+ 121 004e 8093 7C00 		sts 124,r24
+ 122               	.LSM14:
+ 123 0052 8081      		ld r24,Z
+ 124 0054 8064      		ori r24,lo8(64)
+ 125 0056 8083      		st Z,r24
+ 126               	/* epilogue start */
+ 127               	.LBE50:
+ 128               	.LBE49:
+ 129               	.LSM15:
+ 130 0058 0895      		ret
+ 131               	.LFE97:
+ 133               		.section	.text.ProcessNextSample,"ax",@progbits
+ 134               	.global	ProcessNextSample
+ 136               	ProcessNextSample:
+ 137               	.LFB98:
+ 138               	.LSM16:
+ 139               	/* prologue: function */
+ 140               	/* frame size = 0 */
+ 141               	/* stack size = 0 */
+ 142               	.L__stack_usage = 0
+ 143               	.LSM17:
+ 144 0000 A99B      		sbis 53-32,1
+ 145 0002 00C0      		rjmp .L3
+ 146               	.LVL5:
+ 147               	.LBB51:
+ 148               	.LBB52:
+ 149               	.LSM18:
+ 150 0004 8091 0000 		lds r24,USB_DeviceState
+ 151 0008 8430      		cpi r24,lo8(4)
+ 152 000a 01F4      		brne .L3
+ 153 000c 8091 0000 		lds r24,Microphone_Audio_Interface+7
+ 154 0010 8823      		tst r24
+ 155 0012 01F0      		breq .L3
+ 156               	.LSM19:
+ 157 0014 8091 0000 		lds r24,Microphone_Audio_Interface+1
+ 158               	.LVL6:
+ 159               	.LBB53:
+ 160               	.LBB54:
+ 161               	.LSM20:
+ 162 0018 8093 E900 		sts 233,r24
+ 163               	.LBE54:
+ 164               	.LBE53:
+ 165               	.LBB55:
+ 166               	.LBB56:
+ 167               	.LSM21:
+ 168 001c 8091 E800 		lds r24,232
+ 169               	.LBE56:
+ 170               	.LBE55:
+ 171               	.LBE52:
+ 172               	.LBE51:
+ 173               	.LSM22:
+ 174 0020 80FF      		sbrs r24,0
+ 175 0022 00C0      		rjmp .L3
+ 176               	.LBB57:
+ 177               	.LSM23:
+ 178 0024 A99A      		sbi 53-32,1
+ 179               	.LBB58:
+ 180               	.LBB59:
+ 181               	.LSM24:
+ 182 0026 8091 7A00 		lds r24,122
+ 183 002a 8061      		ori r24,lo8(16)
+ 184 002c 8093 7A00 		sts 122,r24
+ 185               	.LSM25:
+ 186 0030 8091 7800 		lds r24,120
+ 187 0034 9091 7900 		lds r25,120+1
+ 188               	.LVL7:
+ 189               	.LBE59:
+ 190               	.LBE58:
+ 191               	.LSM26:
+ 192 0038 26E0      		ldi r18,6
+ 193 003a 880F      	1:	lsl r24
+ 194 003c 991F      		rol r25
+ 195 003e 2A95      		dec r18
+ 196 0040 01F4      		brne 1b
+ 197               	.LVL8:
+ 198               	.LSM27:
+ 199 0042 8F5F      		subi r24,lo8(-(-32767))
+ 200 0044 9F47      		sbci r25,hi8(-(-32767))
+ 201               	.LVL9:
+ 202               	.LBB60:
+ 203               	.LBB61:
+ 204               	.LBB62:
+ 205               	.LBB63:
+ 206               	.LSM28:
+ 207 0046 8093 F100 		sts 241,r24
+ 208               	.LSM29:
+ 209 004a 9093 F100 		sts 241,r25
+ 210               	.LBE63:
+ 211               	.LBE62:
+ 212               	.LBB64:
+ 213               	.LBB65:
+ 214               	.LSM30:
+ 215 004e 2091 F200 		lds r18,242
+ 216 0052 3091 F300 		lds r19,242+1
+ 217               	.LBE65:
+ 218               	.LBE64:
+ 219               	.LSM31:
+ 220 0056 8091 0000 		lds r24,Microphone_Audio_Interface+2
+ 221 005a 9091 0000 		lds r25,Microphone_Audio_Interface+2+1
+ 222               	.LVL10:
+ 223 005e 2817      		cp r18,r24
+ 224 0060 3907      		cpc r19,r25
+ 225 0062 01F4      		brne .L3
+ 226               	.LBB66:
+ 227               	.LBB67:
+ 228               	.LSM32:
+ 229 0064 8091 E800 		lds r24,232
+ 230 0068 8E77      		andi r24,lo8(126)
+ 231 006a 8093 E800 		sts 232,r24
+ 232               	.LVL11:
+ 233               	.L3:
+ 234 006e 0895      		ret
+ 235               	.LBE67:
+ 236               	.LBE66:
+ 237               	.LBE61:
+ 238               	.LBE60:
+ 239               	.LBE57:
+ 240               	.LFE98:
+ 242               		.section	.text.main,"ax",@progbits
+ 243               	.global	main
+ 245               	main:
+ 246               	.LFB96:
+ 247               	.LSM33:
+ 248               	/* prologue: function */
+ 249               	/* frame size = 0 */
+ 250               	/* stack size = 0 */
+ 251               	.L__stack_usage = 0
+ 252               	.LSM34:
+ 253 0000 0E94 0000 		call SetupHardware
+ 254               	.LSM35:
+ 255 0004 80E1      		ldi r24,lo8(16)
+ 256 0006 0E94 0000 		call LEDs_SetAllLEDs
+ 257               	.LSM36:
+ 258               	/* #APP */
+ 259               	 ;  62 "AudioInput.c" 1
+ 260 000a 7894      		sei
+ 261               	 ;  0 "" 2
+ 262               	/* #NOAPP */
+ 263               	.L6:
+ 264               	.LSM37:
+ 265 000c 0E94 0000 		call ProcessNextSample
+ 266               	.LVL12:
+ 267               	.LSM38:
+ 268 0010 0E94 0000 		call USB_USBTask
+ 269 0014 00C0      		rjmp .L6
+ 270               	.LFE96:
+ 272               		.section	.text.EVENT_USB_Device_Connect,"ax",@progbits
+ 273               	.global	EVENT_USB_Device_Connect
+ 275               	EVENT_USB_Device_Connect:
+ 276               	.LFB99:
+ 277               	.LSM39:
+ 278               	/* prologue: function */
+ 279               	/* frame size = 0 */
+ 280               	/* stack size = 0 */
+ 281               	.L__stack_usage = 0
+ 282               	.LSM40:
+ 283 0000 80EA      		ldi r24,lo8(-96)
+ 284 0002 0E94 0000 		call LEDs_SetAllLEDs
+ 285               	.LSM41:
+ 286 0006 83E1      		ldi r24,lo8(19)
+ 287 0008 87BD      		out 71-32,r24
+ 288               	.LSM42:
+ 289 000a 82E0      		ldi r24,lo8(2)
+ 290 000c 84BD      		out 68-32,r24
+ 291               	.LSM43:
+ 292 000e 85BD      		out 69-32,r24
+ 293               	/* epilogue start */
+ 294               	.LSM44:
+ 295 0010 0895      		ret
+ 296               	.LFE99:
+ 298               		.section	.text.EVENT_USB_Device_Disconnect,"ax",@progbits
+ 299               	.global	EVENT_USB_Device_Disconnect
+ 301               	EVENT_USB_Device_Disconnect:
+ 302               	.LFB100:
+ 303               	.LSM45:
+ 304               	/* prologue: function */
+ 305               	/* frame size = 0 */
+ 306               	/* stack size = 0 */
+ 307               	.L__stack_usage = 0
+ 308               	.LSM46:
+ 309 0000 15BC      		out 69-32,__zero_reg__
+ 310               	.LSM47:
+ 311 0002 80E1      		ldi r24,lo8(16)
+ 312 0004 0E94 0000 		call LEDs_SetAllLEDs
+ 313               	/* epilogue start */
+ 314               	.LSM48:
+ 315 0008 0895      		ret
+ 316               	.LFE100:
+ 318               		.section	.text.EVENT_USB_Device_ConfigurationChanged,"ax",@progbits
+ 319               	.global	EVENT_USB_Device_ConfigurationChanged
+ 321               	EVENT_USB_Device_ConfigurationChanged:
+ 322               	.LFB101:
+ 323               	.LSM49:
+ 324               	/* prologue: function */
+ 325               	/* frame size = 0 */
+ 326               	/* stack size = 0 */
+ 327               	.L__stack_usage = 0
+ 328               	.LVL13:
+ 329               	.LSM50:
+ 330 0000 80E0      		ldi r24,lo8(Microphone_Audio_Interface)
+ 331 0002 90E0      		ldi r25,hi8(Microphone_Audio_Interface)
+ 332 0004 0E94 0000 		call Audio_Device_ConfigureEndpoints
+ 333               	.LVL14:
+ 334               	.LSM51:
+ 335 0008 80FF      		sbrs r24,0
+ 336 000a 00C0      		rjmp .L11
+ 337 000c 80E6      		ldi r24,lo8(96)
+ 338               	.LVL15:
+ 339 000e 00C0      		rjmp .L10
+ 340               	.LVL16:
+ 341               	.L11:
+ 342 0010 80E9      		ldi r24,lo8(-112)
+ 343               	.LVL17:
+ 344               	.L10:
+ 345               	.LSM52:
+ 346 0012 0E94 0000 		call LEDs_SetAllLEDs
+ 347               	/* epilogue start */
+ 348               	.LSM53:
+ 349 0016 0895      		ret
+ 350               	.LFE101:
+ 352               		.section	.text.EVENT_USB_Device_UnhandledControlRequest,"ax",@progbits
+ 353               	.global	EVENT_USB_Device_UnhandledControlRequest
+ 355               	EVENT_USB_Device_UnhandledControlRequest:
+ 356               	.LFB102:
+ 357               	.LSM54:
+ 358               	/* prologue: function */
+ 359               	/* frame size = 0 */
+ 360               	/* stack size = 0 */
+ 361               	.L__stack_usage = 0
+ 362               	.LSM55:
+ 363 0000 80E0      		ldi r24,lo8(Microphone_Audio_Interface)
+ 364 0002 90E0      		ldi r25,hi8(Microphone_Audio_Interface)
+ 365 0004 0E94 0000 		call Audio_Device_ProcessControlRequest
+ 366               	/* epilogue start */
+ 367               	.LSM56:
+ 368 0008 0895      		ret
+ 369               	.LFE102:
+ 371               	.global	Microphone_Audio_Interface
+ 372               		.data
+ 375               	Microphone_Audio_Interface:
+ 376 0000 01        		.byte	1
+ 377 0001 01        		.byte	1
+ 378 0002 0001      		.word	256
+ 379 0004 0000 00   		.skip 3,0
+ 380 0007 00        		.skip 1,0
+ 461               	.Letext0:
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 AudioInput.c
+     /tmp/cca2C4Xm.s:2      *ABS*:000000000000003f __SREG__
+     /tmp/cca2C4Xm.s:3      *ABS*:000000000000003e __SP_H__
+     /tmp/cca2C4Xm.s:4      *ABS*:000000000000003d __SP_L__
+     /tmp/cca2C4Xm.s:5      *ABS*:0000000000000034 __CCP__
+     /tmp/cca2C4Xm.s:6      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/cca2C4Xm.s:7      *ABS*:0000000000000001 __zero_reg__
+     /tmp/cca2C4Xm.s:18     .text.LEDs_SetAllLEDs:0000000000000000 LEDs_SetAllLEDs
+     /tmp/cca2C4Xm.s:39     .text.SetupHardware:0000000000000000 SetupHardware
+     /tmp/cca2C4Xm.s:136    .text.ProcessNextSample:0000000000000000 ProcessNextSample
+     /tmp/cca2C4Xm.s:375    .data:0000000000000000 Microphone_Audio_Interface
+     /tmp/cca2C4Xm.s:245    .text.main:0000000000000000 main
+     /tmp/cca2C4Xm.s:275    .text.EVENT_USB_Device_Connect:0000000000000000 EVENT_USB_Device_Connect
+     /tmp/cca2C4Xm.s:301    .text.EVENT_USB_Device_Disconnect:0000000000000000 EVENT_USB_Device_Disconnect
+     /tmp/cca2C4Xm.s:321    .text.EVENT_USB_Device_ConfigurationChanged:0000000000000000 EVENT_USB_Device_ConfigurationChanged
+     /tmp/cca2C4Xm.s:355    .text.EVENT_USB_Device_UnhandledControlRequest:0000000000000000 EVENT_USB_Device_UnhandledControlRequest
+
+UNDEFINED SYMBOLS
+USB_Init
+USB_DeviceState
+USB_USBTask
+Audio_Device_ConfigureEndpoints
+Audio_Device_ProcessControlRequest
+__do_copy_data
