@@ -64,9 +64,9 @@ volatile uint8_t boottimeout = 0;  // the counter we'll use
 void (*app_start)(void) = 0x0000;
 
 // we'll pulse the onboard LED to indicate the bootloader
-#define BOARD_MICROTOUCH 1
+#define BOARD_MICROTOUCH   1
 #define BOARD_ADAFRUIT32U4 2
-#define BOARD_RFPIRATE 3
+#define BOARD_RFPIRATEV1   3
 
 #if BOARD == BOARD_MICROTOUCH
    #define BOOTLOADERLED_DDR DDRC
@@ -78,7 +78,8 @@ void (*app_start)(void) = 0x0000;
    #define BOOTLOADERLED_PORT PORTE
    #define BOOTLOADERLED 6
 #endif
-#if BOARD == BOARD_RFPIRATE
+#if BOARD == BOARD_RFPIRATEV1
+   #include "hw.h"
    #define BOOTLOADERLED_DDR DDRF
    #define BOOTLOADERLED_PORT PORTF
    #define BOOTLOADERLED 0
@@ -106,14 +107,14 @@ int main(void)
   WDTCSR = 0;
 
   /* Must assert ps_hold to lock pwr supply */
-#if BOARD == BOARD_RFPIRATE
-  DDRC |= _BV(7);
-  PORTC |= _BV(7);
+#if BOARD == BOARD_RFPIRATEV1
+  OUTPUT(pshold);
+  HIGH(pshold);
 #endif
 
   boottimeout = 0;
 
-  if (! (ch &  _BV(EXTRF)) &&  (pgm_read_word_near(0) != 0xFFFF)) {
+  if (! (ch &  _BV(EXTRF)) && (pgm_read_word_near(0) != 0xFFFF)) {
     // if its a not an external reset...
     app_start();  // skip bootloader
   }
@@ -128,10 +129,10 @@ int main(void)
 	BOOTLOADERLED_DDR |= _BV( BOOTLOADERLED);
 	BOOTLOADERLED_PORT |= _BV( BOOTLOADERLED);
 
-	uint16_t blinkycounter = 0;
 	uint8_t pwmcounter = 0; // for the LED pulsing
 	uint8_t brightness = 0; // for the LED pulsing
 	int8_t pulsedirection = 1;
+
 	// end adafruit mods
 
 	/* Enable global interrupts so that the USB stack can function */

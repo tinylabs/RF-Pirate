@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 #include <util/delay.h>
+#include <avr/interrupt.h>
 
 #include "ssd1306.h"
 #include "Menu.h"
@@ -35,13 +36,18 @@ ssd1306 oled;
 EXPORT_MENU(m_root);
 Menu menu(m_root, &oled, 1, 5);
 
-// Jump to the bootloader
-typedef void (*remote_call_t) (void);
-remote_call_t bootloader = (remote_call_t)0x3800;
-
+// Define bootloader in memory
+void (*bootloader) (void) = (void (*)())0x3800;
+//void (*bootloader) (void) = (void (*)())0x7000;
 
 void shutdown ();
 void fast_charge_on(void) { HIGH(usb_i_sel); oled.poweroff(); }
+void jmp_bootloader(void) { 
+  cli(); 
+  // Make it look like an external reset
+  MCUSR |= _BV(EXTRF);
+  bootloader(); 
+}
 
 MenuEntry m_settings[] = {
   MenuEntry ("Batt charge mode", &fast_charge_on),
@@ -51,17 +57,10 @@ MenuEntry m_settings[] = {
 MenuEntry m_root[] = {
   MenuEntry ("RF", m_rf_root, &rf_event_notify),
   MenuEntry ("Settings", m_settings),
-  MenuEntry ("Bootloader", bootloader),
+  MenuEntry ("Bootloader", &jmp_bootloader),
   MenuEntry ("Shutdown", &shutdown),
   NULL
 };
-
-
-
-void led_keepalive (uint16_t ticks)
-{
-  TOGGLE(led);
-}
 
 void shutdown ()
 {
@@ -69,6 +68,11 @@ void shutdown ()
   oled.poweroff();
   // Release pshold
   LOW(pshold);
+}
+
+void led_keepalive (uint16_t ticks)
+{
+  TOGGLE(led);
 }
 
 #if 0

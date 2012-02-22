@@ -57,7 +57,7 @@ MCU = atmega32u4
 
 #BOARD  = MICROTOUCH
 #BOARD  = ADAFRUIT32U4
-BOARD  = RFPIRATE
+BOARD  = RFPIRATEV1
 
 
 # Processor frequency.
@@ -93,7 +93,7 @@ F_CLOCK = $(F_CPU)
 #
 # Note that the bootloader size and start address given in AVRStudio is in words and not
 # bytes, and so will need to be doubled to obtain the byte address needed by AVR-GCC.
-BOOT_START = 0x7000
+BOOT_START = 0x0
 
 
 # Output format. (can be srec, ihex, binary)
@@ -355,13 +355,13 @@ LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)
 # Type: avrdude -c ?
 # to get a full listing.
 #
-AVRDUDE_PROGRAMMER = usbtiny
+AVRDUDE_PROGRAMMER = avr109
 
 # com1 = serial port. Use lpt1 to connect to parallel port.
-AVRDUDE_PORT = usb
+AVRDUDE_PORT = /dev/ttyACM0
 
-AVRDUDE_WRITE_FLASH = -B 1 -U flash:w:$(TARGET).hex
-AVRDUDE_WRITE_FUSES = -B 1 -U flash:w:$(TARGET).hex
+AVRDUDE_WRITE_FLASH = -D -U flash:w:$(TARGET).hex
+AVRDUDE_WRITE_FUSES = -D -U flash:w:$(TARGET).hex
 #AVRDUDE_WRITE_EEPROM = -U eeprom:w:$(TARGET).eep
 
 

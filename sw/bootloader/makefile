@@ -57,7 +57,7 @@ MCU = atmega32u4
 
 #BOARD  = MICROTOUCH
 #BOARD  = ADAFRUIT32U4
-BOARD  = RFPIRATE
+BOARD  = RFPIRATEV1
 
 
 # Processor frequency.
@@ -169,7 +169,7 @@ DEBUG = dwarf-2
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS = $(LUFA_PATH)/
+EXTRAINCDIRS = $(LUFA_PATH)/ ../common
 
 
 # Compiler flag to set the C Standard level.
