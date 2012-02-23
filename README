@@ -15,3 +15,25 @@ Please note: All files under sw/lufa-lib, and sw/bootloader are owned by the ver
 All other hardware schematics, gerbers, software is licensed under creative commons (by-nc-sa). For more information read LICENSE or download it from http://creativecommons.org/licenses/by-nc-sa/3.0/legalcode.
 
 Above all I hope people can use and improve this in ways I never intended!
+
+
+Programming with bus pirate
+===========================
+
+RF pirate connector
+-------------------
+
+3.3 mosi gnd
+o    o    o
+o    o    o
+miso sck rst
+--------- <= board edge
+
+Bus pirate v3
+-------------
+gnd = black
+3.3 = white
+mosi = orange
+miso = brown
+sck = yellow
+cs (rst) = red

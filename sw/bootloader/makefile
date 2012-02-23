@@ -345,10 +345,10 @@ LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)
 # Type: avrdude -c ?
 # to get a full listing.
 #
-AVRDUDE_PROGRAMMER = usbtiny
+AVRDUDE_PROGRAMMER = buspirate
 
 # com1 = serial port. Use lpt1 to connect to parallel port.
-AVRDUDE_PORT = usb
+AVRDUDE_PORT = /dev/ttyUSB0
 
 AVRDUDE_WRITE_FLASH = -B 1 -U flash:w:$(TARGET).hex
 AVRDUDE_WRITE_FUSES = -B 1 -U flash:w:$(TARGET).hex
@@ -525,7 +525,8 @@ program: $(TARGET).hex $(TARGET).eep
 
 
 fuse32u4:
-	$(AVRDUDE) $(AVRDUDE_FLAGS) -U lfuse:w:0xFC:m -U hfuse:w:0xD0:m -U efuse:w:0xF3:m
+#	$(AVRDUDE) $(AVRDUDE_FLAGS) -U lfuse:w:0xFC:m -U hfuse:w:0xD0:m -U efuse:w:0xF3:m
+	$(AVRDUDE) $(AVRDUDE_FLAGS) -U lfuse:w:0xDE:m -U hfuse:w:0xD9:m -U efuse:w:0xF3:m
 
 full:  $(TARGET).hex
 	$(AVRDUDE) $(AVRDUDE_FLAGS)
