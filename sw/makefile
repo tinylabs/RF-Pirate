@@ -20,10 +20,14 @@ start:
 	@echo Executing make on all RF Pirate framework.
 	@echo	
 
+# Must clean LUFA before compile since it gets compiled with different flags
 bootloader:
+	make -C lufa-lib/LUFA clean 
 	make -C bootloader all -s
 
+# Must clean LUFA before compile since it gets compiled with different flags
 bsp:
+	make -C lufa-lib/LUFA clean 
 	make -C bsp all -s
 
 end:

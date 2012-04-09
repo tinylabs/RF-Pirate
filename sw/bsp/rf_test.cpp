@@ -35,17 +35,17 @@ uint8_t rf_event_notify (uint8_t event, uint16_t data)
     case EVENT_APP_START:
       sys = (context_t *)data;
       // Carve out some lcd space to display
-      sys->menu->SetLineStartEnd(1, 2);
+      //sys->menu->SetLineStartEnd(1, 2);
       // Initialize the rf card
-      rf_probe();
-      //if (!rf_probe())
-      //sys->disp->drawstring(6, 0, " RF Init failed", 1);
+      //rf_probe();
+      if (!rf_probe())
+	print (6, "RF Init failed", 0);
       return true;
       break;
 
     case EVENT_APP_STOP:
       // Restore menu
-      sys->menu->SetLineStartEnd(1, 5);
+      //sys->menu->SetLineStartEnd(1, 5);
       // Move this into rf driver
       //HIGH(rf_sdn);
       HIGH(led);
@@ -80,51 +80,36 @@ uint8_t rf_event_notify (uint8_t event, uint16_t data)
   return false;  // Pass events to system
 }
 
-static void dump_rf_regs (uint8_t start, uint8_t end)
+
+void unmod_carrier_315 (void)
 {
-  uint8_t left, line = 3;
-  uint8_t buf[7]; // reg buffer
-  char str[21];
-  
-  end = end > 127 ? 127 : end;
-  left = end - start;
+  rf_set_freq(315.0);
 
-  // Clear lines 3 - 6
-  sys->disp->clearline(line);
-  sys->disp->clearline(line+1);
-  sys->disp->clearline(line+2);
-  sys->disp->clearline(line+3);
+  // no modulation
+  rf_spi_write(0x71, 0);
 
-  while (left > 0) {
-    memset (buf, 0, sizeof(buf));
-    // Read regs from si4432
-    rf_spi_readm(end - left, buf, left < 7 ? left : 7);
-    // Print regs into buffer
-    snprintf (str, sizeof(str), "%02x %02x %02x %02x %02x %02x %02x",
-	      buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6]);
-    // print to display
-    sys->disp->drawstring (line, 0, str, 0);
-    sys->disp->display();    
-    left = (left < 7) ? 0 : left - 7;
-    line++;
-  }
+  // Turn on tx_on
+  rf_spi_write(0x7, 0x9);
+  print (6, "[7] = %02X", rf_spi_read(7));
 }
 
-void reg_0_27 (void) { dump_rf_regs(0, 28); }
-void reg_28_55 (void) { dump_rf_regs(28, 56); }
-void reg_56_83 (void) { dump_rf_regs(56, 84); }
-void reg_84_111 (void) { dump_rf_regs(84, 112); }
-void reg_112_127 (void) { dump_rf_regs(112, 128); }
-void reg_exit(void) {
-  // Clear lines 3 - 6
-  sys->disp->clearline(3);
-  sys->disp->clearline(4);
-  sys->disp->clearline(5);
-  sys->disp->clearline(6);
-  // Generate left key
-  evt_handler_event(EVENT_KEYPRESS, KEY_LEFT);
+void unmod_carrier_434 (void)
+{
+  rf_set_freq(434.0);
+
+  // no modulation
+  rf_spi_write(0x71, 0x0);
+
+  // Turn on tx_on
+  rf_spi_write(0x7, 0x9);
+  print (6, "[7] = %02X", rf_spi_read(7));
 }
 
+void unmod_carrier_off (void)
+{
+  // Turn on tx off
+  rf_spi_write(0x7, 0x1);
+}
 
 void keeloq_315_tx (void)
 {
@@ -134,10 +119,10 @@ void keeloq_315_tx (void)
   // Setup packet handling
   rf_spi_write(0x32, 0);    // no broadcast check, no header check
   rf_spi_write(0x33, 0xa);  // hdr len=0, fixpktlen=1, synclen=2
-  rf_spi_write(0x34, 0x3);  // preamble - 3 nibbles = 12 bits
+  rf_spi_write(0x34, 0x5);  // preamble - 3 nibbles = 12 bits
   rf_spi_write(0x36, 0xff); // sync words
   rf_spi_write(0x37, 0x00); 
-  rf_spi_write(0x3e, 8);    // packet length
+  rf_spi_write(0x3e, 32);    // packet length
 
   // data rate = 64kbps
   rf_spi_write (0x6e, 0x10);
@@ -155,7 +140,10 @@ void keeloq_315_tx (void)
   rf_spi_write(0x71, 0x21);
 
   // Tune to 315 Mhz
-  rf_set_freq(315.0);
+  //rf_set_freq(315.0);
+  rf_spi_write(0x75, 0x47);  // Frequency band select
+  rf_spi_write(0x76, 0x7D);  // Nominal carrier freq 1
+  rf_spi_write(0x77, 0x00);  // Nominal carrier freq 0
 
   // Fill in fifo
   for (i = 0; i < 32; i++) {
@@ -170,6 +158,9 @@ void keeloq_315_tx (void)
 
   // Wait for packet to complete
   while (rf_spi_read(7) & 0x8);
+  print (6, "TX Done", 0);
+  _delay_ms(500);
+  print (6, "       ", 0);
 }
 
 void keeloq_315_rx (void)
@@ -296,44 +287,15 @@ void rx_315(void)
   rf_spi_write(0x7, 0x4);
 }
 
-void dump_rx_fifo (void)
-{
-  uint8_t i, line = 3;
-  char str[21];
-  uint8_t byte[7];
-
-  // Clear lines
-  sys->disp->clearline(line);
-  sys->disp->clearline(line+1);
-  sys->disp->clearline(line+2);
-  sys->disp->clearline(line+3);
-  sys->disp->clearline(line+4);
-  
-  for (i = 0; i < 5; i++) {
-    rf_fifo_read(byte, 7);
-    snprintf (str, sizeof(str), "%02x %02x %02x %02x %02x %02x %02x",
-	      byte[0], byte[1], byte[2], byte[3], byte[4], 
-	      byte[5], byte[6]);
-    sys->disp->drawstring (line, 0, str, 0);
-    sys->disp->display();
-    line++;
-  }
-}
-
-MenuEntry m_rf_reg[] = {
-  MenuEntry("Regs 0-27", &reg_0_27),
-  MenuEntry("Regs 28-55", &reg_28_55),
-  MenuEntry("Regs 56-83", &reg_56_83),
-  MenuEntry("Regs 84-111", &reg_84_111),
-  MenuEntry("Regs 112-127", &reg_112_127),
-  MenuEntry("Exit", &reg_exit),
-  NULL
-};
 
 /* Menu Entrys */
 MenuEntry m_rf_root[] = {
-  MenuEntry("Debug registers", m_rf_reg),
-  MenuEntry("RX @ 315", &rx_315),
-  MenuEntry("RX buffer", &dump_rx_fifo),
+  MenuEntry("Keeloq TX", &keeloq_315_tx),
+  MenuEntry("Carrier 315", &unmod_carrier_315),
+  MenuEntry("Carrier 434", &unmod_carrier_434),
+  MenuEntry("Carrier Off", &unmod_carrier_off),
+  
+  //MenuEntry("RX @ 315", &rx_315),
+  //MenuEntry("RX buffer", &dump_rx_fifo),
   NULL
 };

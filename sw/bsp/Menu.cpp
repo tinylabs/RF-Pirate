@@ -30,8 +30,18 @@ void Menu::SetLineStartEnd(uint8_t line_start, uint8_t line_end)
   this->line_start = line_start;
   this->line_end = line_end;
   visible_lines = line_end - line_start + 1;
-  // Clear screen
-  display->clear();
+  // Draw screen
+  DrawMenu();
+}
+
+void Menu::Enable (uint8_t enable)
+{
+  if (enable) {
+    visible_lines = line_end - line_start + 1;
+  }
+  else {
+    visible_lines = 0;
+  }
 }
 
 void Menu::DrawVisible(MenuEntry *top, uint8_t selected, bool items_above,
@@ -109,6 +119,7 @@ void Menu::DrawVisible(MenuEntry *top, uint8_t selected, bool items_above,
   }
 #endif
 }
+
 
 void Menu::DrawMenu (void)
 {

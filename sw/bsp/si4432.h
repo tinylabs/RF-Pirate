@@ -105,6 +105,36 @@ void rf_fifo_read(uint8_t *buf, uint8_t sz);
 void rf_enable_isr(uint16_t mask);
 void rf_disable_isr(uint16_t mask);
 
+typedef enum {
+  ENCODE_KEELOQ_PCM,  // keeloq pulse coded modulation
+  ENCODE_MAX
+} data_encode_t;
+
+// Data structure containing packet format
+typedef struct {
+  uint16_t bit_time_us;   // elementary bit time in us
+  uint8_t preamble_hi_bc; // bit count of preamble high
+  uint8_t preamble_lo_bc; // bit count of preamble low
+  uint8_t preamble_len;   // Min length of preamble
+  uint8_t header_hi_bc;   // bit count of header hi
+  uint8_t header_lo_bc;   // bit count of header low
+  data_encode_t encoding; // data encoding
+  uint8_t data_bc;        // count of payload bits
+} packet_format_t;
+
+#if 0
+packet_format_t keeloq_format = {
+    400, // 400us bit time
+    1,   // preamble hi = 1 bit
+    2,   // preamble lo = 2 bit
+    6,   // 6 preamble bits
+    10,  // header hi = 4ms = 10 bits
+    10,  // header lo = 4ms = 10 bits
+    ENCODE_KEELOQ_PCM, // pulse coded modulation
+    66   // 66 bits = 28(serial) + 32(ci) + 4(fn) + 2(chksum)
+};
+#endif
+
 /** Not to self. Use preamble detect to scan channels and
  * quickly determine if the channel is being used. */
 

@@ -14,9 +14,11 @@
 #include "timetick.h"
 #include "keypad.h"
 #include "hw.h"
+#include "usbserial.h"
 
 // Apps
 #include "rf_test.h"
+#include "rf_debug.h"
 
 // logo + icons
 #include "logo.h"
@@ -29,11 +31,21 @@
 #include "batt_1p0.h"
 
 // pointer to battery icon
-uint8_t *batt_icon;
+uint8_t *batt_icon = batt_1p0;
 
 /* Core objects */
 ssd1306 oled;
 EXPORT_MENU(m_root);
+/* line  (Graphic LCD usage)
+ * 0 - Header
+ * 1 - Menu 1
+ * 2 - ..
+ * 3 - ..
+ * 4 - ..
+ * 5 - Menu 5
+ * 6 - Text system status (yellow)
+ * 7 - icons              (yellow)
+ */
 Menu menu(m_root, &oled, 1, 5);
 
 // Define bootloader in memory
@@ -49,14 +61,10 @@ void jmp_bootloader(void) {
   bootloader(); 
 }
 
-MenuEntry m_settings[] = {
-  MenuEntry ("Batt charge mode", &fast_charge_on),
-  NULL
-};
 
 MenuEntry m_root[] = {
   MenuEntry ("RF", m_rf_root, &rf_event_notify),
-  MenuEntry ("Settings", m_settings),
+  MenuEntry ("RF Debug", m_rf_debug, &rf_debug_notify),
   MenuEntry ("Bootloader", &jmp_bootloader),
   MenuEntry ("Shutdown", &shutdown),
   NULL
@@ -70,30 +78,15 @@ void shutdown ()
   LOW(pshold);
 }
 
-void led_keepalive (uint16_t ticks)
-{
+
+void led_keepalive (uint16_t ticks) {
   TOGGLE(led);
 }
 
-#if 0
-void debug (char *fmt, uint16_t data)
-{
-  char str[21];
-  static uint8_t line = 0;
-  if (line > 6)
-    line = 0;
-  snprintf (str, sizeof(str), fmt, data);
-  oled.drawstring(line, 0, str, 0);
-  oled.display ();
-  line++;
-}
-#endif
-
-void UpdateStatus (const char *str)
-{
-      oled.clearline(6);
-      oled.drawstring(6, 0, str, 0);
-      oled.display();
+void UpdateStatus (const char *str) {
+  oled.clearline(6);
+  oled.drawstring(6, 0, str, 0);
+  oled.display();
 }
 
 
@@ -167,6 +160,11 @@ static uint8_t ui_event_notify (uint8_t event, uint16_t data)
   return 1;
 }
 
+void ui_serial_cb(char *str, uint8_t len)
+{
+  ser.printf ("recv=[%s]\r\n", str);
+}
+
 void ui_setup(void)
 {
   // Register self as initial event handler, never gets popped
@@ -175,13 +173,16 @@ void ui_setup(void)
   // Init Timetick subsystem
   timetick_init();
 
+  // Register serial callback
+  ser.register_recv_cb(ui_serial_cb);
+
   // Start stillalive led 500ms
   OUTPUT(led);
   HIGH(led);
-  //timetick_register(&led_keepalive, 100);
+  timetick_register(&led_keepalive, 50);
 
-  // Start keypad - sample at 60ms
-  keypad_init(8);
+  // Start keypad - sample at 70ms
+  keypad_init(7);
 
   // LCD init + splashscreen
   oled.init(SSD1306_SWITCHCAPVCC);

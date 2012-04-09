@@ -132,18 +132,29 @@ static void rf_config_gpios (void)
   _delay_ms(10);
 }
 
+static uint8_t rf_initialized = 0;
+
 /* Init hardware and verify communications */
 uint8_t rf_probe(void)
 {
+  if (rf_initialized)
+    return 1;
+  
   // Configure gpios
   rf_config_gpios();
 
   // Init spi hw
-  rf_spi_init(6);
+  rf_spi_init(8);
+
+  // Clear any interrupts
+  rf_spi_read(3);
+  rf_spi_read(4);
 
   // Force software reset
   rf_spi_write(7, 0x80);
-  _delay_ms(1);
+
+  // Wait until interrupt is asserted
+  while (READ(rf_irq));
 
   // Setup gpio tx/rx switch selects
   rf_spi_write(0x0b, 0x92);  //gpio0=tx_state
@@ -155,8 +166,9 @@ uint8_t rf_probe(void)
     return 0;
   if (rf_spi_read(1) != 6)
     return 0;
-  
+
   // Si4432 detected
+  rf_initialized = 1;
   return 1;
 }
 
@@ -183,6 +195,10 @@ void rf_set_freq (float freq_mhz)
   fb = hbsel ? (uint16_t)(freq_mhz/2) : (uint16_t)freq_mhz;
   fb = (fb - 240) / 10;
 
+  // clear frequency offset
+  rf_spi_write(0x73, 0);
+  rf_spi_write(0x74, 0);
+
   // Program band select
   rf_spi_write(0x75, (uint8_t)fb | (hbsel << 5));
 
@@ -191,6 +207,9 @@ void rf_set_freq (float freq_mhz)
 		   - fb - 24) * (float)64000);
   // Program nominal carrier
   rf_spi_writem(0x76, (uint8_t *)&fc, 2);
+
+  // No freq hopping
+  rf_spi_write(0x79, 0);
 }
 
 
@@ -303,7 +322,7 @@ ISR(PCINT0_vect)
   uint16_t irq;
 
   // Make sure RF_IRQ is low
-  if (!READ(rf_irq)) {
+  //if (!READ(rf_irq)) {
     // Read RF irq events
     rf_spi_readm(3, (uint8_t *)&irq, 2);
     // Generate async event for each rf irq
@@ -313,5 +332,5 @@ ISR(PCINT0_vect)
 	irq <<= 1;
       }
     }// end for
-  }// end if
+    //}// end if
 }

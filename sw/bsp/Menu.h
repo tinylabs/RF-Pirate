@@ -40,6 +40,7 @@ class Menu {
   void DrawMenu(void);
   void KeyHandler(uint8_t k);
   void SetLineStartEnd(uint8_t line_start, uint8_t line_end);
+  void Enable(uint8_t enable);
 
  private:
   void DrawVisible(MenuEntry *top, uint8_t sel, bool above, bool below);
