@@ -168,8 +168,8 @@ void ssd1306::display(void) {
 	  bm = &font['$' * 5];
 	else {
 	  // Point to icon character
-	  //bm = &(icon[idx].bitmap[(c & 0x7) * 6]);
-	  bm = icon[idx](idx);
+	  // Call icon callback to get icon
+	  bm = (icon[idx] != NULL) ? icon[idx](idx) : &font['$' * 5];
 	  bm = &bm[(c & 0x7) * 6];
 	  icon_flag = 1;
 	}

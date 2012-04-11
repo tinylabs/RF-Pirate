@@ -133,7 +133,8 @@ include $(LUFA_PATH)/LUFA/makefile
 # List C source files here. (C dependencies are automatically generated.)
 SRC =   $(LUFA_SRC_USB)      \
 	$(LUFA_SRC_USBCLASS) \
-	Descriptors.c
+	usb_desc.c           \
+	usb_callbacks.c
 
 
 # List C++ source files here. (C dependencies are automatically generated.)
@@ -148,7 +149,8 @@ CPPSRC =                 \
 	ssd1306.cpp	 \
 	timetick.cpp	 \
 	ui.cpp           \
-	usbserial.cpp    \
+	usb_serial.cpp   \
+	cmd_parser.cpp   \
 	main.cpp
 
 
@@ -695,6 +697,7 @@ clean_list :
 	$(REMOVE) $(SRC:.c=.s)
 	$(REMOVE) $(SRC:.c=.d)
 	$(REMOVE) $(SRC:.c=.i)
+	$(REMOVE) *~
 	$(REMOVEDIR) .dep
 
 doxygen:

@@ -35,7 +35,7 @@
  *  the device's capabilities and functions.
  */
 
-#include "Descriptors.h"
+#include "usb_desc.h"
 
 /* On some devices, there is a factory set internal serial number which can be automatically sent to the host as
  * the device's serial number when the Device Descriptor's .SerialNumStrIndex entry is set to USE_INTERNAL_SERIAL.
@@ -48,6 +48,7 @@
 #if (USE_INTERNAL_SERIAL == NO_DESCRIPTOR)
 	#warning USE_INTERNAL_SERIAL is not available on this AVR - please manually construct a device serial descriptor.
 #endif
+
 
 /** LUFA CDC Class driver interface configuration and state information. 
  * This structure is passed to all CDC Class driver functions, so that 
@@ -72,7 +73,6 @@ USB_ClassInfo_CDC_Device_t VirtualSerial_CDC_Interface = {
     .NotificationEndpointDoubleBank = false,
   },
 };
-
 
 /** Device descriptor structure. This descriptor, located in FLASH memory, describes the overall
  *  device characteristics, including the supported USB version, control endpoint size and the

@@ -6,22 +6,25 @@
  **/
 
 // Keycodes
-#define KEY_UP       0x80
-#define KEY_DOWN     0x81
-#define KEY_LEFT     0x82
-#define KEY_RIGHT    0x83
-#define KEY_SELECT   0x84
+#define KEY_UP                 0x80
+#define KEY_DOWN               0x81
+#define KEY_LEFT               0x82
+#define KEY_RIGHT              0x83
+#define KEY_SELECT             0x84
 
 // System events
-#define EVENT_KEYPRESS     0x10
-#define EVENT_VBATT        0x11
-#define EVENT_SD_DET       0x12
-#define EVENT_SD_RMV       0x13
-#define EVENT_ICON_UPDT    0x14
+#define EVENT_KEYPRESS         0x10
+#define EVENT_VBATT            0x11
+#define EVENT_SD_DET           0x12
+#define EVENT_SD_RMV           0x13
+#define EVENT_ICON_UPDT        0x14
 
 // App events
-#define EVENT_APP_START    0x20
-#define EVENT_APP_STOP     0x21
+#define EVENT_APP_START        0x20
+#define EVENT_APP_STOP         0x21
+
+// Serial events
+#define EVENT_SERIAL_RECV      0x30
 
 // RF IRQ events
 #define EVENT_ISR_FIFO_UNDOVR  0x40

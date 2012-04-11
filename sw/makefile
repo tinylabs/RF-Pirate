@@ -14,7 +14,7 @@
 # "make clean_doxygen" to remove generated Doxygen documentation from everything.
 
 
-all: start bootloader bsp end
+all: start bootloader rfp end
 
 start:
 	@echo Executing make on all RF Pirate framework.
@@ -26,9 +26,9 @@ bootloader:
 	make -C bootloader all -s
 
 # Must clean LUFA before compile since it gets compiled with different flags
-bsp:
+rfp:
 	make -C lufa-lib/LUFA clean 
-	make -C bsp all -s
+	make -C rfp all -s
 
 end:
 	@echo
@@ -37,8 +37,8 @@ end:
 clean:
 	make -C bootloader clean
 	make -C lufa-lib/LUFA clean 
-	make -C bsp clean
+	make -C rfp clean
 
-.PHONY : all start bootloader bsp end clean
+.PHONY : all start bootloader rfp end clean
 
 

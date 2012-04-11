@@ -4,17 +4,18 @@
  **/
 #include <string.h>
 #include <stdio.h>
-
+#include <ctype.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
 #include "ssd1306.h"
 #include "Menu.h"
 
+#include "cmd_parser.h"
 #include "timetick.h"
 #include "keypad.h"
 #include "hw.h"
-#include "usbserial.h"
+#include "usb_serial.h"
 
 // Apps
 #include "rf_test.h"
@@ -32,10 +33,12 @@
 
 // pointer to battery icon
 uint8_t *batt_icon = batt_1p0;
+extern unsigned char font[];
 
-/* Core objects */
+/* Core ui objects */
 ssd1306 oled;
 EXPORT_MENU(m_root);
+
 /* line  (Graphic LCD usage)
  * 0 - Header
  * 1 - Menu 1
@@ -47,6 +50,9 @@ EXPORT_MENU(m_root);
  * 7 - icons              (yellow)
  */
 Menu menu(m_root, &oled, 1, 5);
+
+#define VER_MAJOR 00
+#define VER_MINOR 01
 
 // Define bootloader in memory
 void (*bootloader) (void) = (void (*)())0x3800;
@@ -61,7 +67,7 @@ void jmp_bootloader(void) {
   bootloader(); 
 }
 
-
+// Todo move to menu file
 MenuEntry m_root[] = {
   MenuEntry ("RF", m_rf_root, &rf_event_notify),
   MenuEntry ("RF Debug", m_rf_debug, &rf_debug_notify),
@@ -110,7 +116,7 @@ static void UpdateVbatt (uint8_t level)
   else if (level >= VBATT_0P25) {
     batt_icon = batt_0p25;
   }
-  else { //empty
+  else {
     batt_icon = batt_0p0;
   }
 }
@@ -122,10 +128,12 @@ uint8_t *icon_cb (uint8_t idx)
       return batt_icon;
 
     default:
-      break;
+      // oops someone forgot a callback
+      return &font['$' * 5]; 
   }
   return NULL;
 }
+
 
 static uint8_t ui_event_notify (uint8_t event, uint16_t data)
 {
@@ -151,6 +159,10 @@ static uint8_t ui_event_notify (uint8_t event, uint16_t data)
       UpdateVbatt ((uint8_t)data);
       break;
 
+    case EVENT_SERIAL_RECV:
+      cmdp_parse_cmd((string_t *)data);
+      break;
+
     default:
       // do nothing
       break;
@@ -160,9 +172,9 @@ static uint8_t ui_event_notify (uint8_t event, uint16_t data)
   return 1;
 }
 
-void ui_serial_cb(char *str, uint8_t len)
-{
-  ser.printf ("recv=[%s]\r\n", str);
+// TODO: Move to main
+void process_usb (uint16_t ticks) {
+  ser.process();
 }
 
 void ui_setup(void)
@@ -173,13 +185,16 @@ void ui_setup(void)
   // Init Timetick subsystem
   timetick_init();
 
-  // Register serial callback
-  ser.register_recv_cb(ui_serial_cb);
+  // Init command parser
+  cmdp_init();
 
   // Start stillalive led 500ms
   OUTPUT(led);
   HIGH(led);
   timetick_register(&led_keepalive, 50);
+
+  // process usb every 20ms
+  timetick_register(&process_usb, 2);
 
   // Start keypad - sample at 70ms
   keypad_init(7);
@@ -190,6 +205,7 @@ void ui_setup(void)
   // Register battery icon
   oled.registericon(0, &icon_cb);
   
+  // Show splashscreen
   oled.drawbitmap(logo, 128, 64);
   _delay_ms (2000);
 
@@ -201,5 +217,6 @@ void ui_setup(void)
 void ui_process(void)
 {
   // Dispatch any outstanding events
+  // TODO: move somewhere else
   evt_handler_dispatch();
 }
